@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Market Insights</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="header">
+        <h1>Market Insights</h1>
+        <button class="theme" id="theme">
+          <img src="images/dark-theme.svg" alt="Dark Theme" />
+        </button>
+      </header>
+      <nav class="nav">
+        <button data-type="crypto" class="active">Crypto</button>
+        <button data-type="forex">Forex</button>
+        <button data-type="stocks">Stocks</button>
+      </nav>
+      <main class="main">
+        <div class="search-bar">
+          <input type="text" id="search-input" placeholder="Search asset..." />
+          <button id="search-btn">Search</button>
+        </div>
+        <div class="result-container">
+          <p class="empty-state">Search for a crypto asset to begin.</p>
+        </div>
+      </main>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>
