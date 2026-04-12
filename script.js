@@ -11,6 +11,24 @@ $(document).ready(function () {
     updateUIForType(type);
   });
 
+  // search logic
+  $("#search-btn").click(function () {
+    const type = $(".nav .active").data("type");
+    const query = $("#search-input").val().trim();
+
+    if (!query) {
+      $(".result-container").html(
+        `<p class="empty-state">Please enter a value to search.</p>`,
+      );
+      return;
+    }
+    $(".result-container").html(
+      `<p class="empty-state">Searching for ${query} ...</p>`,
+    );
+
+    // call the correct API based on type
+  });
+
   // helper function to update UI for type selected
   function updateUIForType(type) {
     let placeholder = "";
