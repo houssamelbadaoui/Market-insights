@@ -1,0 +1,149 @@
+:root {
+  --bg: #0d1117;
+  --bg-light: #161b22;
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --border: rgba(255, 255, 255, 0.1);
+  --text: #e6e6e6;
+  --text-light: #9ca3af;
+  --accent: #8b5cf6; /* purple */
+  --radius: 12px;
+  --transition: 0.25s ease;
+  --font: "Inter", sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  display: flex;
+  justify-content: center;
+  padding: 40px;
+}
+
+.app-shell {
+  width: 100%;
+  max-width: 900px;
+  background: var(--bg-light);
+  padding: 20px 30px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(10px);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.header h1 {
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.header img {
+  width: 28px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.theme img:hover {
+  opacity: 0.7;
+}
+
+.nav {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+.nav button {
+  flex: 1;
+  padding: 12px 0;
+  background: var(--bg-light);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-light);
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 15px;
+}
+
+.nav button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.nav button.active {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+.search-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+#search-input {
+  flex: 1;
+  padding: 12px;
+  background: var(--bg-light);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 15px;
+}
+
+#search-btn {
+  padding: 12px 20px;
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius);
+  color: white;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+#search-btn:hover {
+  opacity: 0.85;
+}
+
+.result-container {
+  margin-top: 20px;
+}
+
+.empty-state {
+  color: var(--text-light);
+  text-align: center;
+  padding: 20px 0;
+}
+
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  padding: 20px;
+  border-radius: var(--radius);
+  backdrop-filter: blur(10px);
+  transition: var(--transition);
+}
+
+.card:hover {
+  border-color: var(--accent);
+}
+.card h2 {
+  font-size: 22px;
+  margin-bottom: 10px;
+  color: var(--accent);
+}
+.card p {
+  margin-bottom: 6px;
+  color: var(--text-light);
+}
