@@ -47,6 +47,7 @@ $(document).ready(function () {
     } else if (type === "forex") {
       placeholder = "Search forex pair (e.g. EURUSD)";
       emptyText = "Search for a forex pair to begin.";
+      loadTopForex();
     } else if (type === "stocks") {
       placeholder = "Search stock symbol (e.g. AAPL, TSLA)";
       emptyText = "Search for a stock to begin.";
@@ -196,5 +197,48 @@ $(document).ready(function () {
   `;
 
     $(".result-container").html(card);
+  }
+
+  // function to load top traded forex pairs in the container
+  function loadTopForex() {
+    const topPairs = ["EURUSD", "GBPUSD", "USDJPY", "AUDUSD"];
+
+    $(".result-container").html(
+      `<p class="empty-state">Loading top forex pairs...</p>`,
+    );
+
+    let html = "";
+
+    topPairs.forEach(function (pair) {
+      const base = pair.slice(0, 3);
+      const quote = pair.slice(3);
+
+      const url = `https://open.er-api.com/v6/latest/${base}`;
+
+      $.getJSON(url)
+        .done(function (data) {
+          const rate = data.rates[quote];
+
+          if (rate) {
+            html += createForexCard(base, quote, rate);
+            $(".result-container").html(html);
+          }
+        })
+        .fail(function () {
+          $(".result-container").html(
+            `<p class="empty-state">Failed to load top forex pairs.</p>`,
+          );
+        });
+    });
+  }
+
+  // helper function to create a forex card
+  function createForexCard(base, quote, rate) {
+    return `
+    <div class="card">
+      <h2>${base}/${quote}</h2>
+      <p>1 ${base} = ${rate.toFixed(4)} ${quote}</p>
+    </div>
+  `;
   }
 });
