@@ -40,6 +40,7 @@ $(document).ready(function () {
     if (type === "crypto") {
       placeholder = "Search crypto (e.g. BTC, ETH)";
       emptyText = "Search for a crypto asset to begin.";
+      loadTopCrypto();
     } else if (type === "forex") {
       placeholder = "Search forex pair (e.g. EURUSD)";
       emptyText = "Search for a forex pair to begin.";
@@ -94,5 +95,49 @@ $(document).ready(function () {
     </div>
   `;
     $(".result-container").html(card);
+  }
+
+  // Helper function to load Top crypto when crypto button is clicked
+  function loadTopCrypto() {
+    // Define the list of cryptos
+    const topCoins = ["bitcoin", "ethereum", "solana", "dogecoin"];
+    const ids = topCoins.join(",");
+
+    // build the URL
+    const url = `https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`;
+
+    // Show loading
+    $(".result-container").html(
+      `<p class="empty-state">Loading top cryptos...</p>`,
+    );
+    // $.getJSON
+    $.getJSON(url)
+      .done(function (data) {
+        // loop and build cards
+        let html = "";
+
+        for (let coin in data) {
+          const price = data[coin].usd;
+          const change = data[coin].usd_24h_change;
+          html += createCryptoCard(coin, price, change);
+        }
+        $(".result-container").html(html);
+      })
+      .fail(function () {
+        $(".result-container").html(
+          `<p class="empty-state">Failed to load top cryptos.</p>`,
+        );
+      });
+  }
+
+  // helper function that return  a card string
+  function createCryptoCard(name, price, change) {
+    return `
+    <div class="card">
+      <h2>${name}</h2>
+      <p>Price: $${price}</p>
+      <p>24h Change: ${change.toFixed(2)}%</p>
+    </div>
+  `;
   }
 });
