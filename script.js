@@ -30,6 +30,9 @@ $(document).ready(function () {
     if (type === "crypto") {
       fetchCrypto(query);
     }
+    if (type === "forex") {
+      fetchForex(query);
+    }
   });
 
   // helper function to update UI for type selected
@@ -139,5 +142,59 @@ $(document).ready(function () {
       <p>24h Change: ${change.toFixed(2)}%</p>
     </div>
   `;
+  }
+
+  // function to fetch forex
+  function fetchForex(query) {
+    const pair = query.toUpperCase();
+
+    // validate the length of the input
+    if (pair.length !== 6) {
+      $(".result-container").html(
+        `<p class="empty-state">Please enter a 6-letter pair like EURUSD.</p>`,
+      );
+      return;
+    }
+    // Extract base and quote
+    const base = pair.slice(0, 3);
+    const quote = pair.slice(3);
+
+    // build the url
+    const url = `https://open.er-api.com/v6/latest/${base}`;
+
+    // Show loading
+    $(".result-container").html(
+      `<p class="empty-state">Loading forex rate ...</p>`,
+    );
+
+    // call $.getJSON
+    $.getJSON(url)
+      .done(function (data) {
+        const rate = data.rates[quote];
+        if (!rate) {
+          $(".result-container").html(
+            `<p class="empty-state">Invalid forex pair.</p>`,
+          );
+          return;
+        }
+        renderForexCard(base, quote, rate);
+      })
+      .fail(function () {
+        $(".result-container").html(
+          `<p class="empty-state">Failed to load forex data.</p>`,
+        );
+      });
+  }
+
+  // function to render a forex card inside result container
+  function renderForexCard(base, quote, rate) {
+    const card = `
+    <div class="card">
+      <h2>${base}/${quote}</h2>
+      <p>1 ${base} = ${rate.toFixed(4)} ${quote}</p>
+    </div>
+  `;
+
+    $(".result-container").html(card);
   }
 });
