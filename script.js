@@ -1,13 +1,10 @@
 $(document).ready(function () {
   // 1. Handle tab switching
   $(".nav button").click(function () {
-    // remove the class active from all
     $(".nav button").removeClass("active");
-    // add active to clicked
     $(this).addClass("active");
-    // read data type
+
     const type = $(this).data("type");
-    // Update placeholder + emty state
     updateUIForType(type);
   });
 
@@ -22,20 +19,17 @@ $(document).ready(function () {
       );
       return;
     }
+
     $(".result-container").html(
       `<p class="empty-state">Searching for ${query} ...</p>`,
     );
 
-    // call the correct API based on type
-    if (type === "crypto") {
-      fetchCrypto(query);
-    }
-    if (type === "forex") {
-      fetchForex(query);
-    }
+    if (type === "crypto") fetchCrypto(query);
+    if (type === "forex") fetchForex(query);
+    if (type === "stocks") fetchStocks(query);
   });
 
-  // helper function to update UI for type selected
+  // UI update helper
   function updateUIForType(type) {
     let placeholder = "";
     let emptyText = "";
@@ -51,73 +45,62 @@ $(document).ready(function () {
     } else if (type === "stocks") {
       placeholder = "Search stock symbol (e.g. AAPL, TSLA)";
       emptyText = "Search for a stock to begin.";
+      loadTopStocks();
     }
 
-    // update placeholder
     $("#search-input").attr("placeholder", placeholder);
-
-    // update empty state
     $(".result-container").html(`<p class="empty-state">${emptyText}</p>`);
   }
 
-  // function to fetch crypro
+  // ---------------- CRYPTO ----------------
+
   function fetchCrypto(query) {
-    // build URL
     const url = `https://api.coingecko.com/api/v3/simple/price?ids=${query}&vs_currencies=usd&include_24hr_change=true`;
 
-    // show loading
     $(".result-container").html(`<p class="empty-state">Loading...</p>`);
-    // call $.getJSON
+
     $.getJSON(url)
       .done(function (data) {
-        // if invalid or not found
         if (!data[query]) {
           $(".result-container").html(
             `<p class="empty-state">Crypto not found...</p>`,
           );
+          return;
         }
-        // extract the values
+
         const price = data[query].usd;
         const change = data[query].usd_24h_change;
-        // on sucess => render card
+
         renderCryptoCard(query, price, change);
       })
-      // on error => show error message
       .fail(function () {
-        // error
         console.log("API error.");
       });
   }
 
-  // helper function to render crypto card
   function renderCryptoCard(name, price, change) {
     const card = `
-    <div class="card">
-      <h2>${name}</h2>
-      <p>Price: $${price}</p>
-      <p>24h Change: ${change.toFixed(2)}%</p>
-    </div>
-  `;
+      <div class="card">
+        <h2>${name}</h2>
+        <p>Price: $${price}</p>
+        <p>24h Change: ${change.toFixed(2)}%</p>
+      </div>
+    `;
     $(".result-container").html(card);
   }
 
-  // Helper function to load Top crypto when crypto button is clicked
   function loadTopCrypto() {
-    // Define the list of cryptos
     const topCoins = ["bitcoin", "ethereum", "solana", "dogecoin"];
     const ids = topCoins.join(",");
 
-    // build the URL
     const url = `https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`;
 
-    // Show loading
     $(".result-container").html(
       `<p class="empty-state">Loading top cryptos...</p>`,
     );
-    // $.getJSON
+
     $.getJSON(url)
       .done(function (data) {
-        // loop and build cards
         let html = "";
 
         for (let coin in data) {
@@ -125,6 +108,7 @@ $(document).ready(function () {
           const change = data[coin].usd_24h_change;
           html += createCryptoCard(coin, price, change);
         }
+
         $(".result-container").html(html);
       })
       .fail(function () {
@@ -134,50 +118,48 @@ $(document).ready(function () {
       });
   }
 
-  // helper function that return  a card string
   function createCryptoCard(name, price, change) {
     return `
-    <div class="card">
-      <h2>${name}</h2>
-      <p>Price: $${price}</p>
-      <p>24h Change: ${change.toFixed(2)}%</p>
-    </div>
-  `;
+      <div class="card">
+        <h2>${name}</h2>
+        <p>Price: $${price}</p>
+        <p>24h Change: ${change.toFixed(2)}%</p>
+      </div>
+    `;
   }
 
-  // function to fetch forex
+  // ---------------- FOREX ----------------
+
   function fetchForex(query) {
     const pair = query.toUpperCase();
 
-    // validate the length of the input
     if (pair.length !== 6) {
       $(".result-container").html(
         `<p class="empty-state">Please enter a 6-letter pair like EURUSD.</p>`,
       );
       return;
     }
-    // Extract base and quote
+
     const base = pair.slice(0, 3);
     const quote = pair.slice(3);
 
-    // build the url
     const url = `https://open.er-api.com/v6/latest/${base}`;
 
-    // Show loading
     $(".result-container").html(
       `<p class="empty-state">Loading forex rate ...</p>`,
     );
 
-    // call $.getJSON
     $.getJSON(url)
       .done(function (data) {
         const rate = data.rates[quote];
+
         if (!rate) {
           $(".result-container").html(
             `<p class="empty-state">Invalid forex pair.</p>`,
           );
           return;
         }
+
         renderForexCard(base, quote, rate);
       })
       .fail(function () {
@@ -187,19 +169,16 @@ $(document).ready(function () {
       });
   }
 
-  // function to render a forex card inside result container
   function renderForexCard(base, quote, rate) {
     const card = `
-    <div class="card">
-      <h2>${base}/${quote}</h2>
-      <p>1 ${base} = ${rate.toFixed(4)} ${quote}</p>
-    </div>
-  `;
-
+      <div class="card">
+        <h2>${base}/${quote}</h2>
+        <p>1 ${base} = ${rate.toFixed(4)} ${quote}</p>
+      </div>
+    `;
     $(".result-container").html(card);
   }
 
-  // function to load top traded forex pairs in the container
   function loadTopForex() {
     const topPairs = ["EURUSD", "GBPUSD", "USDJPY", "AUDUSD"];
 
@@ -232,12 +211,100 @@ $(document).ready(function () {
     });
   }
 
-  // helper function to create a forex card
   function createForexCard(base, quote, rate) {
     return `
+      <div class="card">
+        <h2>${base}/${quote}</h2>
+        <p>1 ${base} = ${rate.toFixed(4)} ${quote}</p>
+      </div>
+    `;
+  }
+
+  // ---------------- STOCKS ----------------
+
+  function fetchStocks(query) {
+    const symbol = query.toUpperCase();
+    const url = `https://eodhd.com/api/real-time/${symbol}.US?api_token=demo`;
+    console.log("URL:", url);
+
+    // Loading message
+    $(".result-container").html(
+      `<p class="empty-state">Loading ${symbol}...</p>`,
+    );
+
+    // call $.getJSON()
+    $.getJSON(url)
+      .done(function (data) {
+        console.log(data);
+
+        // validation
+        if (!data || !data.close) {
+          $(".result-container").html(
+            `<p class="empty-state">Stock not found.</p>`,
+          );
+          return;
+        }
+
+        // render the card
+        renderStockCard(stock);
+      })
+      .fail(function () {
+        $(".result-container").html(
+          `<p class="empty-state">Failed to load stock data.</p>`,
+        );
+      });
+  }
+
+  function renderStockCard(stock) {
+    const card = `
     <div class="card">
-      <h2>${base}/${quote}</h2>
-      <p>1 ${base} = ${rate.toFixed(4)} ${quote}</p>
+      <h2>${stock.name} (${stock.symbol})</h2>
+      <p>Price: $${stock.price}</p>
+      <p>Change: ${stock.change} (${stock.changesPercentage}%)</p>
+      <p>High: $${stock.dayHigh}</p>
+      <p>Low: $${stock.dayLow}</p>
+      <p>Volume: ${stock.volume.toLocaleString()}</p>
+    </div>
+  `;
+
+    $(".result-container").html(card);
+  }
+
+  // function to load top stocks
+  function loadTopStocks() {
+    const topStocks = ["AAPL", "TSLA", "MSFT", "AMZN", "NVDA"];
+
+    $(".result-container").html(
+      `<p class="empty-state">Loading top stocks...</p>`,
+    );
+
+    let html = "";
+
+    topStocks.forEach(function (symbol) {
+      // For now, we simulate the data until API works
+      const fakeData = {
+        code: symbol,
+        close: (Math.random() * 200 + 50).toFixed(2),
+        open: (Math.random() * 200 + 50).toFixed(2),
+        high: (Math.random() * 200 + 50).toFixed(2),
+        low: (Math.random() * 200 + 50).toFixed(2),
+        volume: Math.floor(Math.random() * 50000000),
+      };
+
+      html += createStockCard(fakeData);
+      $(".result-container").html(html);
+    });
+  }
+
+  function createStockCard(stock) {
+    return `
+    <div class="card">
+      <h2>${stock.code}</h2>
+      <p>Price: $${stock.close}</p>
+      <p>Open: $${stock.open}</p>
+      <p>High: $${stock.high}</p>
+      <p>Low: $${stock.low}</p>
+      <p>Volume: ${stock.volume.toLocaleString()}</p>
     </div>
   `;
   }
