@@ -130,35 +130,41 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  padding: 20px;
-  border-radius: var(--radius);
-  backdrop-filter: blur(10px);
-  transition: var(--transition);
+  padding: 16px;
+  margin: 12px 0;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  color: #fff;
 }
 
-.card:hover {
-  border-color: var(--accent);
-}
-.card h2 {
-  font-size: 22px;
-  margin-bottom: 10px;
-  color: var(--accent);
-}
-.card p {
-  margin-bottom: 6px;
-  color: var(--text-light);
+.card .info h2 {
+  margin: 0 0 6px;
+  font-size: 20px;
+  text-transform: capitalize;
 }
 
-.card .info {
-  flex: 1;
+.card .info p {
+  margin: 2px 0;
+  font-size: 14px;
 }
+
 .card .chart {
   width: 120px;
   height: 60px;
 }
+
 .card canvas {
   width: 100% !important;
   height: 100% !important;
+}
+
+.green {
+  color: #4ade80; /* green-400 */
+}
+
+.red {
+  color: #f87171; /* red-400 */
 }
