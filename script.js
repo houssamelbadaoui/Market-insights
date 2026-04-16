@@ -239,6 +239,8 @@ $(document).ready(function () {
           </div>
           </div>
         `);
+        const history = generateFakeHistory();
+        renderForexChart(base + quote, history);
       })
       .fail(() =>
         $(".result-container").html(
