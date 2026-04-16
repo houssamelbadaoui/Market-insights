@@ -203,7 +203,7 @@ $(document).ready(function () {
     });
   }
 
-  // ---------------- FOREX (unchanged) ----------------
+  //  FOREX
   function fetchForex(query) {
     const pair = query.toUpperCase();
     if (pair.length !== 6) {
@@ -229,9 +229,14 @@ $(document).ready(function () {
         }
 
         $(".result-container").html(`
-          <div class="card">
+          <div class="card forex-card">
+          <div class="info">
             <h2>${base}/${quote}</h2>
             <p>1 ${base} = ${rate.toFixed(4)} ${quote}</p>
+          </div>
+          <div class="chart">
+            <canvas id="chart-${base}${quote}"></canvas>
+          </div>
           </div>
         `);
       })
@@ -256,15 +261,43 @@ $(document).ready(function () {
         const rate = data.rates[quote];
         if (rate) {
           html += `
-              <div class="card">
-                <h2>${base}/${quote}</h2>
-                <p>1 ${base} = ${rate.toFixed(4)} ${quote}</p>
-              </div>
-            `;
+          <div class="card forex-card">
+          <div class="info">
+            <h2>${base}/${quote}</h2>
+            <p>1 ${base} = ${rate.toFixed(4)} ${quote}</p>
+          </div>
+          <div class="chart">
+            <canvas id="chart-${base}${quote}"></canvas>
+          </div>
+          </div>
+        `;
           $(".result-container").html(html);
         }
       });
     });
+    setTimeout(() => {
+      topPairs.forEach((pair) => {
+        const history = generateFakeHistory();
+        renderForexChart(pair, history);
+      });
+    }, 300);
+  }
+
+  // function to generate fake history for charts
+  function generateFakeHistory() {
+    const history = [];
+    let value = 1 + Math.random() * 0.5; // start near 1.0
+
+    for (let i = 0; i < 20; i++) {
+      value += (Math.random() - 0.5) * 0.02;
+      history.push(parseFloat(value.toFixed(4)));
+    }
+    return history;
+  }
+
+  // function to render the chart
+  function renderForexChart(pair, history) {
+    renderCryptoChart(pair, history);
   }
 
   // ---------------- STOCKS (still using fake data) ----------------
