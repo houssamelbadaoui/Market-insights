@@ -127,6 +127,9 @@ body {
 }
 
 .card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   background: var(--card-bg);
   border: 1px solid var(--border);
   padding: 20px;
@@ -146,4 +149,16 @@ body {
 .card p {
   margin-bottom: 6px;
   color: var(--text-light);
+}
+
+.card .info {
+  flex: 1;
+}
+.card .chart {
+  width: 120px;
+  height: 60px;
+}
+.card canvas {
+  width: 100% !important;
+  height: 100% !important;
 }

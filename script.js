@@ -38,6 +38,7 @@ $(document).ready(function () {
       placeholder = "Search crypto (e.g. BTC, ETH)";
       emptyText = "Search for a crypto asset to begin.";
       loadTopCrypto();
+      return;
     } else if (type === "forex") {
       placeholder = "Search forex pair (e.g. EURUSD)";
       emptyText = "Search for a forex pair to begin.";
@@ -49,7 +50,7 @@ $(document).ready(function () {
     }
 
     $("#search-input").attr("placeholder", placeholder);
-    $(".result-container").html(`<p class="empty-state">${emptyText}</p>`);
+    //$(".result-container").html(`<p class="empty-state">${emptyText}</p>`);
   }
 
   // ---------------- CRYPTO ----------------
@@ -80,13 +81,20 @@ $(document).ready(function () {
 
   function renderCryptoCard(name, price, change) {
     const card = `
-      <div class="card">
+      <div class="card crypto-card">
+      <div class="info">
         <h2>${name}</h2>
         <p>Price: $${price}</p>
         <p>24h Change: ${change.toFixed(2)}%</p>
       </div>
+      <div class="chart">
+        <canvas id="chart-${name}"></canvas>
+      </div>
+      </div>
     `;
     $(".result-container").html(card);
+    const history = generateFakeHistory();
+    renderCryptoChart(name, history);
   }
 
   function loadTopCrypto() {
@@ -103,13 +111,21 @@ $(document).ready(function () {
       .done(function (data) {
         let html = "";
 
-        for (let coin in data) {
+        // 1. Build ALL cards first
+        topCoins.forEach((coin) => {
           const price = data[coin].usd;
           const change = data[coin].usd_24h_change;
           html += createCryptoCard(coin, price, change);
-        }
+        });
 
+        // 2. Insert HTML ONCE
         $(".result-container").html(html);
+
+        // 3. Now draw charts
+        topCoins.forEach((coin) => {
+          const history = generateFakeHistory();
+          renderCryptoChart(coin, history);
+        });
       })
       .fail(function () {
         $(".result-container").html(
@@ -120,12 +136,51 @@ $(document).ready(function () {
 
   function createCryptoCard(name, price, change) {
     return `
-      <div class="card">
+      <div class="card crypto-card">
+      <div class="info">
         <h2>${name}</h2>
         <p>Price: $${price}</p>
         <p>24h Change: ${change.toFixed(2)}%</p>
       </div>
+      <div class="chart">
+        <canvas id="chart-${name}"></canvas>
+      </div>
+      </div>
     `;
+  }
+
+  // fake data for the chart
+  function generateFakeHistory() {
+    const history = [];
+    for (let i = 0; i < 20; i++) {
+      history.push(100 + Math.random() * 20); // random prices
+    }
+    return history;
+  }
+
+  // function to render the chart using the data
+  function renderCryptoChart(name, history) {
+    const ctx = document.getElementById(`chart-${name}`);
+
+    new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: history.map((_, i) => i + 1),
+        datasets: [
+          {
+            data: history,
+            borderColor: "#8b5cf6",
+            borderWidth: 2,
+            fill: false,
+            tension: 0.3,
+          },
+        ],
+      },
+      options: {
+        plugins: { legend: { display: false } },
+        scales: { x: { display: false }, y: { display: false } },
+      },
+    });
   }
 
   // ---------------- FOREX ----------------
